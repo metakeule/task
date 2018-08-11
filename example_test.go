@@ -125,18 +125,31 @@ func TestEx(t *testing.T) {
 func Example() {
 	fmt.Println("")
 
-	ex := newExample("Bob\nMini")
+	var bf bytes.Buffer
 
-	err := task.Run(ex.Run)
+	// For sake of clarity, we use closures here.
+	// In real code you might want to use methods of
+	// a struct that contains your shared data.
+
+	second := func() (task.Task, error) {
+		bf.WriteString("Car: Mini\n")
+		return nil, nil
+	}
+
+	first := func() (task.Task, error) {
+		bf.WriteString("Name: Bob\n")
+		return second, nil
+	}
+
+	err := task.Run(first)
 
 	if err != nil {
 		return
 	}
 
-	fmt.Println(ex.String())
+	fmt.Println(bf.String())
 
 	// Output:
 	// Name: Bob
 	// Car: Mini
-	// cheers
 }
