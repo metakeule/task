@@ -8,22 +8,22 @@ import (
 	"testing"
 )
 
-func newSystem(input string) *system {
-	return &system{inputs: strings.Split(input, "\n")}
+func newExample(input string) *example {
+	return &example{inputs: strings.Split(input, "\n")}
 }
 
-type system struct {
+type example struct {
 	target string
 	inputs []string
 	inPtr  int
 	result bytes.Buffer
 }
 
-func (s *system) String() string {
+func (s *example) String() string {
 	return s.result.String()
 }
 
-func (s *system) getInput() string {
+func (s *example) getInput() string {
 	if s.inPtr > len(s.inputs)-1 {
 		return ""
 	}
@@ -35,11 +35,11 @@ func (s *system) getInput() string {
 	return s.inputs[s.inPtr]
 }
 
-func (s *system) Run() (task.Command, error) {
+func (s *example) Run() (task.Task, error) {
 	return s.dispatchByName()
 }
 
-func (s *system) dispatchByName() (task.Command, error) {
+func (s *example) dispatchByName() (task.Task, error) {
 	name := s.getInput()
 	if name == "" {
 		return nil, nil
@@ -58,7 +58,7 @@ func (s *system) dispatchByName() (task.Command, error) {
 
 }
 
-func (s *system) handleMale() (task.Command, error) {
+func (s *example) handleMale() (task.Task, error) {
 	car := s.getInput()
 	if car == "" {
 		return nil, fmt.Errorf("missing car")
@@ -68,12 +68,12 @@ func (s *system) handleMale() (task.Command, error) {
 	return s.cheers, nil
 }
 
-func (s *system) cheers() (task.Command, error) {
+func (s *example) cheers() (task.Task, error) {
 	s.result.WriteString("cheers\n")
 	return nil, nil
 }
 
-func (s *system) handleFemale() (task.Command, error) {
+func (s *example) handleFemale() (task.Task, error) {
 	pet := s.getInput()
 	if pet == "" {
 		return nil, fmt.Errorf("missing pet")
@@ -83,12 +83,12 @@ func (s *system) handleFemale() (task.Command, error) {
 	return s.byebye, nil
 }
 
-func (s *system) byebye() (task.Command, error) {
+func (s *example) byebye() (task.Task, error) {
 	s.result.WriteString("byebye\n")
 	return nil, nil
 }
 
-func TestSystem(t *testing.T) {
+func TestEx(t *testing.T) {
 
 	tests := []struct {
 		input    string
@@ -104,19 +104,19 @@ func TestSystem(t *testing.T) {
 
 	for _, test := range tests {
 
-		sys := newSystem(test.input)
-		err := task.New(sys.Run).Run()
+		ex := newExample(test.input)
+		err := task.Run(ex.Run)
 
 		if err == nil && test.err != nil {
-			t.Errorf("sys := newSystem(%v); err := task.New(sys.Run).Run(); err = nil; want %#v", test.input, test.err.Error())
+			t.Errorf("ex := newExample(%v); err := task.Run(ex.Run); err = nil; want %#v", test.input, test.err.Error())
 		}
 
 		if err != nil && test.err == nil {
-			t.Errorf("sys := newSystem(%v); err := task.New(sys.Run).Run(); err := task.Run(); err = %#v; want nil", test.input, err)
+			t.Errorf("ex := newExample(%v); err := task.Run(ex.Run); err := task.Run(); err = %#v; want nil", test.input, err)
 		}
 
-		if got, want := sys.String(), test.expected; got != want {
-			t.Errorf("sys := newSystem(%v); err := task.New(sys.Run).Run(); sys.String() = %#v; want %#v", test.input, got, want)
+		if got, want := ex.String(), test.expected; got != want {
+			t.Errorf("ex := newExample(%v); err := task.Run(ex.Run); ex.String() = %#v; want %#v", test.input, got, want)
 		}
 	}
 
@@ -125,15 +125,15 @@ func TestSystem(t *testing.T) {
 func Example() {
 	fmt.Println("")
 
-	sys := newSystem("Bob\nMini")
+	ex := newExample("Bob\nMini")
 
-	err := task.New(sys.Run).Run()
+	err := task.Run(ex.Run)
 
 	if err != nil {
 		return
 	}
 
-	fmt.Println(sys.String())
+	fmt.Println(ex.String())
 
 	// Output:
 	// Name: Bob

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-  Package task provides a simple task manager to easen error handling.
+  Package task provides a minimal task management to streamline error handling.
 
   See the example.
 
